@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --time=02:00:00
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=16G
+#SBATCH --mem=32G
 #SBATCH --partition=generic
 
 # Adapted from https://github.com/pytorch/fairseq/blob/master/examples/backtranslation/prepare-de-monolingual.sh

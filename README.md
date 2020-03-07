@@ -73,7 +73,7 @@ bash scripts/data/download_data.sh
 Preprocess and binarize the previously downloaded data:
 
 ```
-bash scripts/data_preprocess_data.sh
+bash scripts/data/preprocess_data.sh
 ```
 
 

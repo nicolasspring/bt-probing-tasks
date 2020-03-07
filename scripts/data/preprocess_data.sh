@@ -14,5 +14,3 @@ echo "Submitted batch job $WMTPREP"
 # preprocessing of monolingual data is dependent on first job
 sbatch -D $REPO -o slurm-%j-preprocess-de-monolingual.out --dependency=afterok:$WMTPREP \
     $SDATA/job-preprocess-de-monolingual.sh $REPO
-
-echo "preprocessing completed."

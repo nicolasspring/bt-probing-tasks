@@ -15,8 +15,6 @@ REPO=$1
 
 cd $REPO
 
-mkdir -p $REPO/checkpoints/checkpoints_de_en_parallel
-
 CHECKPOINT_DIR=$REPO/checkpoints/checkpoints_de_en_parallel
 
 fairseq-train --fp16 \

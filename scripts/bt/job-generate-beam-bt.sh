@@ -15,8 +15,6 @@ REPO=$1
 
 cd $REPO
 
-mkdir -p $REPO/backtranslations/beam
-
 BT_OUT=$REPO/backtranslations/beam
 CHECKPOINT_DIR=$REPO/checkpoints/checkpoints_de_en_parallel
 

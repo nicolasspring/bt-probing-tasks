@@ -11,8 +11,6 @@
 
 REPO=$1
 
-mkdir -p $REPO/backtranslations/beam
-
 BT_OUT=$REPO/backtranslations/beam
 
 python $REPO/software/fairseq-states/examples/backtranslation/extract_bt_data.py \

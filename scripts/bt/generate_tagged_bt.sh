@@ -6,6 +6,8 @@ REPO=`dirname "$SCRIPTS"`
 
 cd $REPO
 
+mkdir -p $REPO/backtranslations/tagged
+
 BT_IN=$REPO/backtranslations/beam
 BT_OUT=$REPO/backtranslations/tagged
 

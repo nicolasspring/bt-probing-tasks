@@ -6,6 +6,8 @@ REPO=`dirname "$SCRIPTS"`
 
 cd $REPO
 
+mkdir -p $REPO/backtranslations/beam
+
 module load generic
 # extracts back-translations from the fairseq output and combines the shards
 sbatch -D $REPO -o slurm-%j-extract-beam-bt.out $SBT/job-extract-beam-bt.sh $REPO

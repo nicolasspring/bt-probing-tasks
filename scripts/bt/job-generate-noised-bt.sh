@@ -9,8 +9,6 @@
 
 REPO=$1
 
-mkdir -p $REPO/backtranslations/noised
-
 BT_IN=$REPO/backtranslations/beam
 BT_OUT=$REPO/backtranslations/noised
 

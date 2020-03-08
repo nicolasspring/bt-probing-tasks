@@ -6,6 +6,8 @@ REPO=`dirname "$SCRIPTS"`
 
 cd $REPO
 
+mkdir -p $REPO/backtranslations/noised
+
 module load generic
 # adds noise to back-translations to create a noisedBT dataset
 sbatch -D $REPO -o slurm-%j-generate-noised-bt.out $SBT/job-generate-noised-bt.sh $REPO

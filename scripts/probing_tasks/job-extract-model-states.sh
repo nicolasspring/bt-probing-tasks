@@ -2,9 +2,9 @@
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
-#SBATCH --gres=gpu:Tesla-K80:2
+#SBATCH --gres=gpu:Tesla-V100:1
 #SBATCH --qos=vesta
-#SBATCH --partition=vesta
+#SBATCH --partition=volta
 
 # calling script needs to set:
 # $REPO

@@ -36,6 +36,6 @@ cp $WMT18_DATA/test.en $BITEXT_OUT/test.en
 cp $WMT18_DATA/test.de $BEAM_OUT/tmp/test.de
 cp $WMT18_DATA/test.de $NOISED_OUT/tmp/test.de
 
-module load vesta cuda/10.0
+module load volta cuda/10.0
 # creates the back-translated probing task datasets
 sbatch -D $REPO -o slurm-%j-create-probing-task-datasets.out $SBT/job-create-probing-task-datasets.sh $REPO

@@ -101,6 +101,21 @@ for L in $src $tgt; do
 done
 
 
+# Creating datasets with reserved tokens for BT and noise
+mkdir -p $OUTDIR/tmp/reserved
+cp $OUTDIR/train.en $OUTDIR/tmp/reserved/train.en
+cp $OUTDIR/train.de $OUTDIR/tmp/reserved/train.de
+echo "<BT> BLANK" >> $OUTDIR/tmp/reserved/train.en
+echo "<BT> BLANK" >> $OUTDIR/tmp/reserved/train.de
+
+# Creating a joined dictionary
+python $REPO/scripts/data/create_shared_dict.py \
+            $OUTDIR/tmp/reserved/train.en $OUTDIR/tmp/reserved/train.de \
+            --threshold 0 \
+            --workers 8 \
+            --dict-out $OUTDIR/dict.en.txt
+
+
 # Adapted from https://github.com/pytorch/fairseq/tree/master/examples/backtranslation
 
 cd $REPO
@@ -109,9 +124,12 @@ TEXT=$OUTDIR
 
 fairseq-preprocess \
     --joined-dictionary \
+    --srcdict $OUTDIR/dict.en.txt \
     --source-lang en --target-lang de \
     --trainpref $TEXT/train --validpref $TEXT/valid --testpref $TEXT/test \
-    --destdir $REPO/data-bin/wmt18_en_de --thresholdtgt 0 --thresholdsrc 0 \
+    --destdir $REPO/data-bin/wmt18_en_de \
     --workers 8
 
-cp $TEXT/code data-bin/wmt18_en_de/code
+cp $TEXT/code $REPO/data-bin/wmt18_en_de/code
+cp $OUTDIR/dict.en.txt $REPO/data-bin/wmt18_en_de/dict.en.txt
+cp $OUTDIR/dict.en.txt $REPO/data-bin/wmt18_en_de/dict.de.txt

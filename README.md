@@ -86,6 +86,12 @@ Train a reverse (de-en) model for back-translating the monolingual target data:
 bash scripts/training/train_reverse_model.sh
 ```
 
+Evaluate the model to make sure it is well trained:
+
+```
+bash scripts/evaluation/evaluate_reverse_model.sh
+```
+
 
 
 ### Obtaining Back-Translations
@@ -148,6 +154,12 @@ Train a model with parallel data and beam back-translation:
 bash scripts/training/train_beam_model.sh
 ```
 
+Evaluate the model to make sure it is well trained:
+
+```
+bash scripts/evaluation/evaluate_beam_model.sh
+```
+
 #### Training the noisedBT Model
 
 Train a model with parallel data and noised back-translation:
@@ -156,12 +168,24 @@ Train a model with parallel data and noised back-translation:
 bash scripts/training/train_noised_model.sh
 ```
 
+Evaluate the model to make sure it is well trained:
+
+```
+bash scripts/evaluation/evaluate_noised_model.sh
+```
+
 #### (Optional) Training the taggedBT Model
 
 Train a model with parallel data and tagged back-translation:
 
 ```
 bash scripts/training/train_tagged_model.sh
+```
+
+Evaluate the model to make sure it is well trained:
+
+```
+bash scripts/evaluation/evaluate_tagged_model.sh
 ```
 
 
@@ -184,3 +208,44 @@ bash scripts/probing_tasks/extract_model_states.sh
 
 This script will use the datasets previously created and save model states for two experiments: **genuine source text vs. back-translation** and **genuine source text vs. noised back-translation**.
 
+#### Checking the Dimensions of the Extracted States
+
+Sanity checks: This script checks if all states have the correct dimensions. It compares the C axis (`encoder_embed_dim`) to the model configuration and checks if no batches are larger than the batch size specified in the training commands. In the probing task step, states will be padded to the highest number of time steps in the training set.
+
+Training set for **genuine source text vs. back-translation** :
+
+```
+python scripts/checks/check_state_shapes.py \
+	model_states/en_de_parallel_plus_bt_beam/bitext/train/ \
+	model_states/en_de_parallel_plus_bt_beam/beam/train/
+```
+
+Training set for **genuine source text vs. noised back-translation** :
+
+```
+python scripts/checks/check_state_shapes.py \
+	model_states/en_de_parallel_plus_bt_noised/bitext/train/ \
+	model_states/en_de_parallel_plus_bt_noised/noised/train/
+```
+
+Checking the test sets:
+
+```
+python scripts/checks/check_state_shapes.py \
+	model_states/en_de_parallel_plus_bt_beam/bitext/test/ \
+	model_states/en_de_parallel_plus_bt_beam/beam/test/ \
+	model_states/en_de_parallel_plus_bt_noised/bitext/test/ \
+	model_states/en_de_parallel_plus_bt_noised/noised/test/
+```
+
+
+
+### Training Models (Probing Task)
+
+Combine the model states and use them as features for the probing tasks:
+
+```
+bash scripts/probing_tasks/run_probing_tasks.sh
+```
+
+This script creates a directory each in `./probing_tasks/` for the two experiments. The directories contain CSV files with the results and the pickled classifiers.

@@ -9,8 +9,9 @@ cd $REPO
 # preprocessing and binarizing the downloaded data
 
 module load generic
-WMTPREP=$(sbatch -D $REPO -o slurm-%j-preprocess-wmt18en2de.out $SDATA/job-preprocess-wmt18en2de.sh $REPO | grep -Po "[0-9]+$")
-echo "Submitted batch job $WMTPREP"
+WMTPREP=$(sbatch -D $REPO -o slurm-%j-preprocess-wmt18en2de.out $SDATA/job-preprocess-wmt18en2de.sh $REPO \
+| tee /dev/tty \
+| grep -Po "[0-9]+$")
 # preprocessing of monolingual data is dependent on first job
 sbatch -D $REPO -o slurm-%j-preprocess-de-monolingual.out --dependency=afterok:$WMTPREP \
     $SDATA/job-preprocess-de-monolingual.sh $REPO

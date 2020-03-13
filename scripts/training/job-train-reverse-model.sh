@@ -28,3 +28,8 @@ fairseq-train --fp16 \
     --max-tokens 3584 --update-freq 16 \
     --max-update 30000 \
     --save-dir $CHECKPOINT_DIR
+
+# copy code and files to checkpoint dir for easy loading of model
+cp $REPO/data-bin/wmt18_en_de/code $CHECKPOINT_DIR/code
+cp $REPO/data-bin/wmt18_en_de/dict.de.txt $CHECKPOINT_DIR/dict.de.txt
+cp $REPO/data-bin/wmt18_en_de/dict.en.txt $CHECKPOINT_DIR/dict.en.txt

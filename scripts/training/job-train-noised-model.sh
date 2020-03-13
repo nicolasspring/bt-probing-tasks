@@ -34,3 +34,8 @@ python $REPO/software/fairseq-states/scripts/average_checkpoints.py \
     --inputs $CHECKPOINT_DIR \
     --num-epoch-checkpoints 10 \
     --output $CHECKPOINT_DIR/checkpoint.avg10.pt
+
+# copy code and files to checkpoint dir for easy loading of model
+cp $REPO/data-bin/wmt18_en_de/code $CHECKPOINT_DIR/code
+cp $REPO/data-bin/wmt18_en_de/dict.de.txt $CHECKPOINT_DIR/dict.de.txt
+cp $REPO/data-bin/wmt18_en_de/dict.en.txt $CHECKPOINT_DIR/dict.en.txt

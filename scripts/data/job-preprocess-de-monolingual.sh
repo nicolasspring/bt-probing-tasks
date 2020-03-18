@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=02:00:00
+#SBATCH --time=03:00:00
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --partition=generic
@@ -75,10 +75,10 @@ else
 fi
 
 
-if [ -f $OUTDIR/bpe.monolingual.dedup.00.de ]; then
+if [ -f $OUTDIR/bpe.monolingual.dedup.000.de ]; then
     echo "found sharded data, skipping sharding step"
 else
-    split --lines 1000000 --numeric-suffixes \
+    split --lines 100000 --numeric-suffixes -a 3 \
         --additional-suffix .${LANG} \
         $tmp/bpe.monolingual.dedup.${SUBSAMPLE_SIZE}.${LANG} \
         $OUTDIR/bpe.monolingual.dedup.
@@ -90,7 +90,7 @@ cd $REPO
 
 TEXT=$OUTDIR
 
-for SHARD in $(seq -f "%02g" 0 24); do \
+for SHARD in $(seq -f "%03g" 0 242); do \
     fairseq-preprocess \
         --only-source \
         --source-lang de --target-lang en \

@@ -11,9 +11,10 @@
 
 REPO=$1
 
-BT_OUT=$REPO/backtranslations/beam
+BT_OUT=$REPO/backtranslations/beam/out
+EXTRACTED=$REPO/backtranslations/beam
 
 python $REPO/software/fairseq-states/examples/backtranslation/extract_bt_data.py \
     --minlen 1 --maxlen 250 --ratio 1.5 \
-    --output $BT_OUT/bt_beam --srclang en --tgtlang de \
+    --output $EXTRACTED/bt_beam --srclang en --tgtlang de \
     $BT_OUT/beam.shard*.out

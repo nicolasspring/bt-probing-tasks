@@ -8,4 +8,4 @@ cd $REPO
 
 module load volta cuda/10.0
 # evaluate the reverse model (de-en)
-sbatch -D $REPO -o slurm-%j-evaluate-reverse-model.out $STRAINING/job-evaluate-reverse-model.sh $REPO
+sbatch -D $REPO -o slurm-%j-evaluate-reverse-model.out $SEVAL/job-evaluate-reverse-model.sh $REPO

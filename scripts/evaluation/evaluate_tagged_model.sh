@@ -8,4 +8,4 @@ cd $REPO
 
 module load volta cuda/10.0
 # evaluate the tagged model (en-de)
-sbatch -D $REPO -o slurm-%j-evaluate-tagged-model.out $STRAINING/job-evaluate-tagged-model.sh $REPO
+sbatch -D $REPO -o slurm-%j-evaluate-tagged-model.out $SEVAL/job-evaluate-tagged-model.sh $REPO

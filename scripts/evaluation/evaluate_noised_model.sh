@@ -8,4 +8,4 @@ cd $REPO
 
 module load volta cuda/10.0
 # evaluate the noised model (en-de)
-sbatch -D $REPO -o slurm-%j-evaluate-noised-model.out $STRAINING/job-evaluate-noised-model.sh $REPO
+sbatch -D $REPO -o slurm-%j-evaluate-noised-model.out $SEVAL/job-evaluate-noised-model.sh $REPO

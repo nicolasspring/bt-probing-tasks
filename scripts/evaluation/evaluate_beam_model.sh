@@ -8,4 +8,4 @@ cd $REPO
 
 module load volta cuda/10.0
 # evaluate the beam model (en-de)
-sbatch -D $REPO -o slurm-%j-evaluate-beam-model.out $STRAINING/job-evaluate-beam-model.sh $REPO
+sbatch -D $REPO -o slurm-%j-evaluate-beam-model.out $SEVAL/job-evaluate-beam-model.sh $REPO

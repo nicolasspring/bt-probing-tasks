@@ -11,7 +11,7 @@ BT_OUT=$REPO/backtranslations/beam/out
 
 mkdir -p $REPO/backtranslations/beam/out
 
-# Adapted from https://github.com/bricksdont/noise-distill/blob/master/scripts/translation/decode_parallel_generic.sh
+# Adapted from https://github.com/pytorch/fairseq/blob/master/examples/backtranslation/prepare-de-monolingual.sh
 
 module load volta cuda/10.0
 
@@ -22,9 +22,14 @@ for SHARD in $(seq -f "%03g" 0 242); do
     if [[ -f $OUTPUT ]]; then
         NUM_LINES_INPUT=$(cat $INPUT | wc -l)
         NUM_LINES_OUTPUT=$(awk '/^H-/{hypos++}END{print hypos}' $OUTPUT)
+        SKIPPED=$(grep -Po \
+            '(?<=WARNING | fairseq.data.data_utils | )\d+(?= samples have invalid sizes and will be skipped)' $OUTPUT)
+        if [ -z "$SKIPPED" ]; then
+            SKIPPED=0
+        fi
 
-        if [[ $NUM_LINES_INPUT == $NUM_LINES_OUTPUT ]]; then
-            echo "chunk $SHARD exists and number of lines is equal to input ($NUM_LINES_INPUT == $NUM_LINES_OUTPUT)."
+        if [[ $NUM_LINES_INPUT == $(($NUM_LINES_OUTPUT + $SKIPPED)) ]]; then
+            echo "chunk $SHARD OK: ($NUM_LINES_INPUT input == $NUM_LINES_OUTPUT output + $SKIPPED skipped)."
             continue
         fi
     fi

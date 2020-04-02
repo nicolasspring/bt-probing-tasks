@@ -172,7 +172,7 @@ def probing_task(X_train: pd.DataFrame,
 
     print(f'Results for experiment {bt_name} with {experiment}:')
     print(results)
-    results.to_csv(os.path.join(out_dir, f'results_{experiment}_{bt_name}.csv'))
+    results.to_csv(os.path.join(out_dir, f'results_{experiment}_{bt_name}.csv'), index=False)
     return results
 
 

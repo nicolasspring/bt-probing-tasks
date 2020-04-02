@@ -7,7 +7,7 @@ import os
 import torch
 
 ENCODER_EMBED_DIM = 1024
-MAX_TOKENS = 14336
+MAX_TOKENS = 3584
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()

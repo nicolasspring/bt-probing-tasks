@@ -18,7 +18,7 @@ mkdir -p $REPO/probing_task_data/noised/data-bin/{train,test}
 
 WMT18_DATA=$REPO/data_prep/wmt18_en_de
 
-TRAIN_SIZE=30000
+TRAIN_SIZE=50000
 
 # to make sure different language splits are parallel
 # source: https://www.gnu.org/software/coreutils/manual/html_node/Random-sources.html#Random-sources

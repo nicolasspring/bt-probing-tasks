@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=16G
+#SBATCH --mem=32G
 #SBATCH --partition=generic
 
 # Adapted from https://github.com/pytorch/fairseq/tree/master/examples/backtranslation

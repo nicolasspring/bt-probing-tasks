@@ -12,5 +12,6 @@ BT_IN=$REPO/backtranslations/beam
 BT_OUT=$REPO/backtranslations/tagged
 
 # adds <BT> tags to back-translations to create a taggedBT dataset
-sed 's/^/<BT> /' $BT_IN/bt_beam.de > $BT_OUT/bt_tagged.de
 sed 's/^/<BT> /' $BT_IN/bt_beam.en > $BT_OUT/bt_tagged.en
+
+cp $BT_IN/bt_beam.de $BT_OUT/bt_tagged.de

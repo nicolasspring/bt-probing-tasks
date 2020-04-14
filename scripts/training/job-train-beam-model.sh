@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=120:00:00
+#SBATCH --time=7-00:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:Tesla-V100:1

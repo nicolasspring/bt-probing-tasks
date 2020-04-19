@@ -42,7 +42,7 @@ def get_max_train_seq_len(directories: List[str], logger: logging.Logger) -> int
         states_dir, _, filenames = next(os.walk(os.path.abspath(directory)))
         for filename in filenames:
             all_files.append(os.path.join(states_dir, filename))
-    all_tensors = (torch.load(filename) for filename in all_files)
+    all_tensors = (torch.load(filename, map_location=torch.device('cpu')) for filename in all_files)
     max_len = max(all_tensors, key=lambda x: x.shape[0]).shape[0]
     # please compare to the output of scripts/checks/check_state_shapes.py
     logger.info(f'maximum number of time steps is {max_len}')
@@ -61,8 +61,8 @@ def pad_states(directory: str, max_len: int, logger: logging.Logger) -> torch.Te
     '''
     logger.info(f'reading tensors from {directory}')
     states_dir, _, filenames = next(os.walk(os.path.abspath(directory)))
-    tensors = [torch.load(os.path.join(states_dir, filename)) for filename in filenames
-                if filename.startswith('batch') and filename.endswith('.pt')]
+    tensors = [torch.load(os.path.join(states_dir, filename), map_location=torch.device('cpu'))
+               for filename in filenames if filename.startswith('batch') and filename.endswith('.pt')]
     # please compare to the output of scripts/checks/check_state_shapes.py
     logger.info(f'encoder size is {tensors[0].shape[2]}')
 
@@ -92,8 +92,8 @@ def average_states(directory: str, logger: logging.Logger) -> torch.Tensor:
     '''
     logger.info(f'reading tensors from {directory}')
     states_dir, _, filenames = next(os.walk(os.path.abspath(directory)))
-    tensors = [torch.load(os.path.join(states_dir, filename)) for filename in filenames
-                if filename.startswith('batch') and filename.endswith('.pt')]
+    tensors = [torch.load(os.path.join(states_dir, filename), map_location=torch.device('cpu'))
+               for filename in filenames if filename.startswith('batch') and filename.endswith('.pt')]
     # please compare to the output of scripts/checks/check_state_shapes.py
     logger.info(f'encoder size is {tensors[0].shape[2]}')
 
@@ -102,11 +102,11 @@ def average_states(directory: str, logger: logging.Logger) -> torch.Tensor:
 
     # concatenating tensors to create a feature matrix
     X = torch.cat(tensors, dim=0)
-    logger.info(f'created padded feature matrix with shape {X.shape}')
+    logger.info(f'created averaged feature matrix with shape {X.shape}')
     return X
 
 
-def create_dataset(source_matrix: torch.Tensor, bt_matrix: torch.Tensor) -> Tuple[pd.DataFrame]:
+def create_dataset(source_matrix: torch.Tensor, bt_matrix: torch.Tensor) -> Tuple[pd.DataFrame, pd.Series]:
     '''
     creates an X matrix and a y vector for sklearn training from two tensors.
     source tensor receives label 0, bt tensor receives label 1.
@@ -152,8 +152,19 @@ def probing_task(X_train: pd.DataFrame,
         out_dir     output directory
         logger      a logging.Logger instance
     '''
-    linear_clf_params = {}
-    mlp_clf_params = {}
+    linear_clf_params = {'C': 0.0001,
+                         'max_iter': 100,
+                         'solver': 'liblinear',
+                         'tol': 1e-4
+                         }
+    mlp_clf_params = {'activation': 'relu',
+                      'alpha': 0.0001,
+                      'beta_1': 0.9,
+                      'epsilon': 10e-8,
+                      'hidden_layer_sizes': (100,),
+                      'learning_rate_init': 0.0001,
+                      'solver': 'lbfgs'
+                      }
     linear_clf = LogisticRegression(**linear_clf_params)
     mlp_clf = MLPClassifier(**mlp_clf_params)
 
@@ -188,7 +199,7 @@ def main(args: argparse.Namespace):
 
     max_len = get_max_train_seq_len([args.genuine, args.bt], logger)
 
-    # experiment with padding
+    # padding experiment
     padded_genuine_train = pad_states(os.path.join(args.genuine, 'train'), max_len, logger)
     padded_genuine_test = pad_states(os.path.join(args.genuine, 'test'), max_len, logger)
     padded_bt_train = pad_states(os.path.join(args.bt, 'train'), max_len, logger)
@@ -206,7 +217,7 @@ def main(args: argparse.Namespace):
                                    out_dir,
                                    logger)
 
-    # experiment with averaging
+    # averaging experiment
     averaged_genuine_train = average_states(os.path.join(args.genuine, 'train'), logger)
     averaged_genuine_test = average_states(os.path.join(args.genuine, 'test'), logger)
     averaged_bt_train = average_states(os.path.join(args.bt, 'train'), logger)

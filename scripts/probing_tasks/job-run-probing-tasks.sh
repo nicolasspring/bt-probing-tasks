@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --time=24:00:00
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=256G
+#SBATCH --mem=300G
 #SBATCH --partition=generic
 
 # calling script needs to set:
@@ -26,5 +26,5 @@ echo "Experiment genuine vs noisedBT"
 python $REPO/scripts/probing_tasks/run_experiment.py \
         --genuine $BINOISED/bitext/ \
         --bt $BINOISED/noised/ \
-        --bt-name beamBT \
+        --bt-name noisedBT \
         --out-dir $OUT_PROBING_NOISED

@@ -15,6 +15,6 @@ OUT_PROBING_NOISED=$REPO/probing_tasks/genuine_vs_noisedBT
 mkdir -p $REPO/probing_tasks/genuine_vs_beamBT
 mkdir -p $REPO/probing_tasks/genuine_vs_noisedBT
 
-module load generic
+module load hpc
 # runs the two probing tasks
 sbatch -D $REPO -o slurm-%j-run-probing-tasks.out $SBT/job-run-probing-tasks.sh $REPO

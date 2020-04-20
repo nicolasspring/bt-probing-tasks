@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --time=24:00:00
+#SBATCH --time=12:00:00
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=300G
-#SBATCH --partition=generic
+#SBATCH --mem=256G
+#SBATCH --partition=hpc
 
 # calling script needs to set:
 # $REPO

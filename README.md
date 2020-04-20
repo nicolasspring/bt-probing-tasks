@@ -1,6 +1,6 @@
 # Probing Tasks for Noised Back-Translation
 
-This repository contains the code necessary to reproduce the experiments and results in the bachelor's thesis Probing "Tasks for Noised Back-Translation" by Nicolas Spring. The thesis is concerned with the theory proposed by [Caswell et al. (2019)](https://arxiv.org/pdf/1906.06442.pdf) that noise in back-translation (BT) serves as an implicit label. The code in this repository was used to train the NMT models in [Edunov et al. (2018)](https://arxiv.org/pdf/1808.09381.pdf), extract model states and train [sklearn](https://scikit-learn.org/stable/) classifiers on them.
+This repository contains the code necessary to reproduce the experiments and results in the bachelor's thesis Probing "Tasks for Noised Back-Translation" by Nicolas Spring.
 
 
 
@@ -249,3 +249,13 @@ bash scripts/probing_tasks/run_probing_tasks.sh
 ```
 
 This script creates a directory each in `./probing_tasks/` for the two experiments. The directories contain CSV files with the results and the pickled classifiers.
+
+### Qualitative Analysis
+
+To generate back-translations from the taggedBT model with and without the `<BT>` tag:
+
+```bash
+bash scripts/qualitative_analysis/generate_qualitative_analysis_data.sh
+```
+
+This script translates the validation and test sets and creates raw and postprocessed output files.

@@ -25,14 +25,14 @@ fairseq-generate $QA_BIN/no_tag \
     --path $CHECKPOINTS_TAGGED/checkpoint_best.pt \
     --max-tokens 4096 \
     --beam 5 \
-| tee $QUALITATIVE_ANALYSIS/valid/out/valid_no_tag.out # raw out file
+| tee $QUALITATIVE_ANALYSIS/valid/out/valid_no_tag.out \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
-| tee $QUALITATIVE_ANALYSIS/valid/valid_no_tag.bpe.en # translations extracted and sorted
+| tee $QUALITATIVE_ANALYSIS/valid/valid_no_tag.bpe.en \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/valid/valid_no_tag.postprocessed.en # postprocessed output file
+> $QUALITATIVE_ANALYSIS/valid/valid_no_tag.postprocessed.en
 
 
 # generating translations for test without tag
@@ -41,14 +41,14 @@ fairseq-generate $QA_BIN/no_tag \
     --path $CHECKPOINTS_TAGGED/checkpoint_best.pt \
     --max-tokens 4096 \
     --beam 5 \
-| tee $QUALITATIVE_ANALYSIS/test/out/test_no_tag.out # raw out file
+| tee $QUALITATIVE_ANALYSIS/test/out/test_no_tag.out \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
-| tee $QUALITATIVE_ANALYSIS/test/test_no_tag.bpe.en # translations extracted and sorted
+| tee $QUALITATIVE_ANALYSIS/test/test_no_tag.bpe.en \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/test/test_no_tag.postprocessed.en # postprocessed output file
+> $QUALITATIVE_ANALYSIS/test/test_no_tag.postprocessed.en
 
 
 # generating translations for valid with tag
@@ -57,14 +57,14 @@ fairseq-generate $QA_BIN/tag \
     --path $CHECKPOINTS_TAGGED/checkpoint_best.pt \
     --max-tokens 4096 \
     --beam 5 \
-| tee $QUALITATIVE_ANALYSIS/valid/out/valid_tag.out # raw out file
+| tee $QUALITATIVE_ANALYSIS/valid/out/valid_tag.out \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
-| tee $QUALITATIVE_ANALYSIS/valid/valid_tag.bpe.en # translations extracted and sorted
+| tee $QUALITATIVE_ANALYSIS/valid/valid_tag.bpe.en \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/valid/valid_tag.postprocessed.en # postprocessed output file
+> $QUALITATIVE_ANALYSIS/valid/valid_tag.postprocessed.en
 
 
 # generating translations for test with tag
@@ -73,11 +73,11 @@ fairseq-generate $QA_BIN/tag \
     --path $CHECKPOINTS_TAGGED/checkpoint_best.pt \
     --max-tokens 4096 \
     --beam 5 \
-| tee $QUALITATIVE_ANALYSIS/test/out/test_tag.out # raw out file
+| tee $QUALITATIVE_ANALYSIS/test/out/test_tag.out \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
-| tee $QUALITATIVE_ANALYSIS/test/test_tag.bpe.en # translations extracted and sorted
+| tee $QUALITATIVE_ANALYSIS/test/test_tag.bpe.en \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/test/test_tag.postprocessed.en # postprocessed output file
+> $QUALITATIVE_ANALYSIS/test/test_tag.postprocessed.en

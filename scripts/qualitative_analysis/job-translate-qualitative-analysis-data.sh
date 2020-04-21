@@ -26,6 +26,7 @@ fairseq-generate $QA_BIN/no_tag \
     --max-tokens 4096 \
     --beam 5 \
 | tee $QUALITATIVE_ANALYSIS/valid/out/valid_no_tag.out \
+| grep -P '^H-' \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
@@ -42,6 +43,7 @@ fairseq-generate $QA_BIN/no_tag \
     --max-tokens 4096 \
     --beam 5 \
 | tee $QUALITATIVE_ANALYSIS/test/out/test_no_tag.out \
+| grep -P '^H-' \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
@@ -58,6 +60,7 @@ fairseq-generate $QA_BIN/tag \
     --max-tokens 4096 \
     --beam 5 \
 | tee $QUALITATIVE_ANALYSIS/valid/out/valid_tag.out \
+| grep -P '^H-' \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
@@ -74,6 +77,7 @@ fairseq-generate $QA_BIN/tag \
     --max-tokens 4096 \
     --beam 5 \
 | tee $QUALITATIVE_ANALYSIS/test/out/test_tag.out \
+| grep -P '^H-' \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \

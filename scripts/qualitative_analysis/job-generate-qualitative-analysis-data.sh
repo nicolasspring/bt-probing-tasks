@@ -52,15 +52,28 @@ cp $DATA_BIN/{code,dict.de.txt} $QA_BIN/tag/
 
 
 # copying the human translations
-cp $DATA_TXT/valid.de $QUALITATIVE_ANALYSIS/valid/valid_ht.bpe.en
-cp $DATA_TXT/test.de $QUALITATIVE_ANALYSIS/test/test_ht.bpe.en
+cp $DATA_TXT/valid.de $QUALITATIVE_ANALYSIS/valid/valid_ht.bpe.de
+cp $DATA_TXT/test.de $QUALITATIVE_ANALYSIS/test/test_ht.bpe.de
 
 cat $DATA_TXT/valid.de \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/valid/valid_ht.postprocessed.en
+> $QUALITATIVE_ANALYSIS/valid/valid_ht.postprocessed.de
 
 cat $DATA_TXT/test.de \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/test/test_ht.postprocessed.en
+> $QUALITATIVE_ANALYSIS/test/test_ht.postprocessed.de
+
+cp $DATA_TXT/valid.en $QUALITATIVE_ANALYSIS/valid/valid_source.bpe.en
+cp $DATA_TXT/test.en $QUALITATIVE_ANALYSIS/test/test_source.bpe.en
+
+cat $DATA_TXT/valid.en \
+| sed "s/\@\@ //g" \
+| perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
+> $QUALITATIVE_ANALYSIS/valid/valid_source.postprocessed.en
+
+cat $DATA_TXT/test.en \
+| sed "s/\@\@ //g" \
+| perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
+> $QUALITATIVE_ANALYSIS/test/test_source.postprocessed.en

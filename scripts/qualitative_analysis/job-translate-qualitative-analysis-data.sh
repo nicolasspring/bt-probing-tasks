@@ -30,10 +30,10 @@ fairseq-generate $QA_BIN/no_tag \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
-| tee $QUALITATIVE_ANALYSIS/valid/valid_no_tag.bpe.en \
+| tee $QUALITATIVE_ANALYSIS/valid/valid_no_tag.bpe.de \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/valid/valid_no_tag.postprocessed.en
+> $QUALITATIVE_ANALYSIS/valid/valid_no_tag.postprocessed.de
 
 
 # generating translations for test without tag
@@ -47,10 +47,10 @@ fairseq-generate $QA_BIN/no_tag \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
-| tee $QUALITATIVE_ANALYSIS/test/test_no_tag.bpe.en \
+| tee $QUALITATIVE_ANALYSIS/test/test_no_tag.bpe.de \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/test/test_no_tag.postprocessed.en
+> $QUALITATIVE_ANALYSIS/test/test_no_tag.postprocessed.de
 
 
 # generating translations for valid with tag
@@ -64,10 +64,10 @@ fairseq-generate $QA_BIN/tag \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
-| tee $QUALITATIVE_ANALYSIS/valid/valid_tag.bpe.en \
+| tee $QUALITATIVE_ANALYSIS/valid/valid_tag.bpe.de \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/valid/valid_tag.postprocessed.en
+> $QUALITATIVE_ANALYSIS/valid/valid_tag.postprocessed.de
 
 
 # generating translations for test with tag
@@ -81,7 +81,7 @@ fairseq-generate $QA_BIN/tag \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
-| tee $QUALITATIVE_ANALYSIS/test/test_tag.bpe.en \
+| tee $QUALITATIVE_ANALYSIS/test/test_tag.bpe.de \
 | sed "s/\@\@ //g" \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/test/test_tag.postprocessed.en
+> $QUALITATIVE_ANALYSIS/test/test_tag.postprocessed.de

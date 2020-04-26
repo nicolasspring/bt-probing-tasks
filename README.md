@@ -29,7 +29,7 @@ After cloning the repository to your machine, there are the following steps:
 
 
 
-### Creating a Virtual Environment
+### 1. Creating a Virtual Environment
 
 Create an environment with Python 3.6 using `conda`:
 
@@ -41,7 +41,7 @@ bash scripts/create_virtualenv.sh
 
 
 
-### Installing Software
+### 2. Installing Software
 
 ```
 bash scripts/install_packages.sh
@@ -62,7 +62,7 @@ This scripts will install the following packages:
 
 
 
-### Downloading and Preprocessing Data
+### 3. Downloading and Preprocessing Data
 
 Download the parallel and monolingual target data for model training and back-translation:
 
@@ -78,7 +78,7 @@ bash scripts/data/preprocess_data.sh
 
 
 
-### Training a Reverse Model for Back-Translation
+### 4. Training a Reverse Model for Back-Translation
 
 Train a reverse (de-en) model for back-translating the monolingual target data:
 
@@ -94,7 +94,7 @@ bash scripts/evaluation/evaluate_reverse_model.sh
 
 
 
-### Obtaining Back-Translations
+### 5. Obtaining Back-Translations
 
 #### Beam Search Back-Translations
 
@@ -144,7 +144,7 @@ bash scripts/bt/combine_datasets.sh
 
 
 
-### Training Models
+### 6. Training Models
 
 #### Training the beamBT Model
 
@@ -174,7 +174,7 @@ Evaluate the model to make sure it is well trained:
 bash scripts/evaluation/evaluate_noised_model.sh
 ```
 
-#### (Optional) Training the taggedBT Model
+#### Training the taggedBT Model
 
 Train a model with parallel data and tagged back-translation:
 
@@ -190,7 +190,7 @@ bash scripts/evaluation/evaluate_tagged_model.sh
 
 
 
-### Extracting Model States for the Probing Task
+### 7. Extracting Model States for the Probing Task
 
 #### Creating Train and Test Datasets
 
@@ -240,7 +240,7 @@ python scripts/checks/check_state_shapes.py \
 
 
 
-### Training Models (Probing Task)
+### 8. Training Models (Probing Task)
 
 Combine the model states and use them as features for the probing tasks:
 
@@ -250,9 +250,9 @@ bash scripts/probing_tasks/run_probing_tasks.sh
 
 This script creates a directory each in `./probing_tasks/` for the two experiments. The directories contain CSV files with the results and the pickled classifiers.
 
-### Qualitative Analysis
+### 9. Qualitative Analysis
 
-To generate back-translations from the taggedBT model with and without the `<BT>` tag:
+To perform qualitative analysis on the taggedBT model, generate back-translations with and without the `<BT>` tag:
 
 ```bash
 bash scripts/qualitative_analysis/generate_qualitative_analysis_data.sh

@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
 
 def main(args: argparse.Namespace):
     print(f'Encoder size: {ENCODER_EMBED_DIM}')
-    print(f'Max tokens: {MAX_TOKENS}')
+    print(f'Max tokens: {MAX_TOKENS}\n')
     for directory in args.states_dir:
         print(f'Testing {directory}...')
         state_names = []
@@ -27,7 +27,7 @@ def main(args: argparse.Namespace):
                 if name.startswith('batch') and name.endswith('.pt'):
                     state_names.append(os.path.join(dirpath, name))
 
-        states = (torch.load(name) for name in state_names)
+        states = (torch.load(name, map_location=torch.device('cpu')) for name in state_names)
 
         # shape of extracted states is T x B x C
         max_timesteps = 0

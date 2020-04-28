@@ -14,4 +14,4 @@ mkdir -p $REPO/model_states/en_de_parallel_plus_bt_noised/{bitext,noised}/{train
 
 module load volta cuda/10.0
 # extracts model states for probing task data
-sbatch -D $REPO -o slurm-%j-extract-model-states.out $SBT/job-extract-model-states.sh $REPO
+sbatch -D $REPO -o slurm-%j-extract-model-states.out $SPT/job-extract-model-states.sh $REPO

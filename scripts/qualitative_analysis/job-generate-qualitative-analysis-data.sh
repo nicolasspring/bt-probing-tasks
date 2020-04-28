@@ -65,6 +65,8 @@ cat $DATA_TXT/test.de \
 | perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
 > $QUALITATIVE_ANALYSIS/test/test_ht.postprocessed.de
 
+
+# copying the source sentences
 cp $DATA_TXT/valid.en $QUALITATIVE_ANALYSIS/valid/valid_source.bpe.en
 cp $DATA_TXT/test.en $QUALITATIVE_ANALYSIS/test/test_source.bpe.en
 

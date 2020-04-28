@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=10:00:00
+#SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:Tesla-V100:1
@@ -20,6 +20,7 @@ NOISED_OUT=$REPO/probing_task_data/noised
 
 WMT18_DATA=$REPO/data_prep/wmt18_en_de
 CHECKPOINT_DIR=$REPO/checkpoints/checkpoints_de_en_parallel
+
 
 # binarize train and test set
 # (this step is identical for beamBT and noisedBT and thus will only be performed once)
@@ -46,7 +47,8 @@ fairseq-preprocess \
 cp $REPO/data-bin/wmt18_en_de/dict.en.txt $BEAM_OUT/data-bin/test/
 cp $BEAM_OUT/data-bin/test/* $NOISED_OUT/data-bin/test/
 
-# generating back-translations for the train and test set
+
+# generating and extracting back-translations for the train and test set
 # (this step is identical for beamBT and noisedBT and thus will only be performed once)
 
 fairseq-generate --fp16 \
@@ -55,8 +57,15 @@ fairseq-generate --fp16 \
     --skip-invalid-size-inputs-valid-test \
     --max-tokens 4096 \
     --beam 5 \
-> $BEAM_OUT/tmp/bt_train.out
+| tee $BEAM_OUT/tmp/bt_train.out \
+| grep -P '^H-' \
+| awk -F'H-' '{print $2}' \
+| sort -n \
+| cut -f 3 \
+> $BEAM_OUT/tmp/bt/bt_beam_train.en
 cp $BEAM_OUT/tmp/bt_train.out $NOISED_OUT/tmp/bt_train.out
+cp $BEAM_OUT/tmp/bt/bt_beam_train.en $BEAM_OUT/train.en
+cp $BEAM_OUT/tmp/bt/bt_beam_train.en $NOISED_OUT/tmp/bt/bt_beam_train.en
 
 fairseq-generate --fp16 \
     $BEAM_OUT/data-bin/test \
@@ -64,25 +73,16 @@ fairseq-generate --fp16 \
     --skip-invalid-size-inputs-valid-test \
     --max-tokens 4096 \
     --beam 5 \
-> $BEAM_OUT/tmp/bt_test.out
+| tee $BEAM_OUT/tmp/bt_test.out \
+| grep -P '^H-' \
+| awk -F'H-' '{print $2}' \
+| sort -n \
+| cut -f 3 \
+> $BEAM_OUT/tmp/bt/bt_beam_test.en
 cp $BEAM_OUT/tmp/bt_test.out $NOISED_OUT/tmp/bt_test.out
-
-# extracting backtranslations from fairseq output
-# (this step is identical for beamBT and noisedBT and thus will only be performed once)
-
-python $REPO/software/fairseq-states/examples/backtranslation/extract_bt_data.py \
-    --minlen 1 --maxlen 250 --ratio 1.5 \
-    --output $BEAM_OUT/tmp/bt/bt_beam_train --srclang en --tgtlang de \
-    $BEAM_OUT/tmp/bt_train.out
-cp $BEAM_OUT/tmp/bt/bt_beam_train.en $BEAM_OUT/train.en
-cp $BEAM_OUT/tmp/bt/bt_beam_train.en $NOISED_OUT/tmp/bt/bt_beam_train.en
-
-python $REPO/software/fairseq-states/examples/backtranslation/extract_bt_data.py \
-    --minlen 1 --maxlen 250 --ratio 1.5 \
-    --output $BEAM_OUT/tmp/bt/bt_beam_test --srclang en --tgtlang de \
-    $BEAM_OUT/tmp/bt_test.out
 cp $BEAM_OUT/tmp/bt/bt_beam_test.en $BEAM_OUT/test.en
 cp $BEAM_OUT/tmp/bt/bt_beam_test.en $NOISED_OUT/tmp/bt/bt_beam_test.en
+
 
 # adding noise to create noisedBT train and test sets
 

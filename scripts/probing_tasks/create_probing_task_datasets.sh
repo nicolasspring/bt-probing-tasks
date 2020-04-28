@@ -11,13 +11,12 @@ BEAM_OUT=$REPO/probing_task_data/beam
 NOISED_OUT=$REPO/probing_task_data/noised
 
 mkdir -p $REPO/probing_task_data/bitext
-mkdir -p $REPO/probing_task_data/beam/tmp/bt
-mkdir -p $REPO/probing_task_data/noised/tmp/bt
-mkdir -p $REPO/probing_task_data/beam/data-bin/{train,test}
-mkdir -p $REPO/probing_task_data/noised/data-bin/{train,test}
+mkdir -p $REPO/probing_task_data/{beam,noised}/tmp/bt
+mkdir -p $REPO/probing_task_data/{beam,noised}/data-bin/{train,test}
 
 WMT18_DATA=$REPO/data_prep/wmt18_en_de
 
+# size of training set is TRAIN_SIZE*2 (TRAIN_SIZE sentences of bitext and bt each)
 TRAIN_SIZE=25000
 
 # to make sure different language splits are parallel
@@ -38,4 +37,4 @@ cp $WMT18_DATA/test.de $NOISED_OUT/tmp/test.de
 
 module load volta cuda/10.0
 # creates the back-translated probing task datasets
-sbatch -D $REPO -o slurm-%j-create-probing-task-datasets.out $SBT/job-create-probing-task-datasets.sh $REPO
+sbatch -D $REPO -o slurm-%j-create-probing-task-datasets.out $SPT/job-create-probing-task-datasets.sh $REPO

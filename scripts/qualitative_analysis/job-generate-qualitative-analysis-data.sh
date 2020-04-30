@@ -1,81 +1,98 @@
 #!/bin/bash
 #SBATCH --time=00:30:00
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
-#SBATCH --partition=generic
-
+#SBATCH --gres=gpu:Tesla-V100:1
+#SBATCH --qos=vesta
+#SBATCH --partition=volta
 
 # calling script needs to set:
 # $REPO
 
 REPO=$1
 
-MOSES=$REPO/data_prep/mosesdecoder
+BPEROOT=$REPO/data_prep/subword-nmt/subword_nmt
+CHECKPOINT_DIR=$REPO/checkpoints/checkpoints_en_de_parallel_plus_bt_tagged
 
 QUALITATIVE_ANALYSIS=$REPO/qualitative_analysis
-QA_BIN=$QUALITATIVE_ANALYSIS/bin
-QA_TEXT=$QUALITATIVE_ANALYSIS/text
-DATA_TXT=$REPO/data_prep/wmt18_en_de
-DATA_BIN=$REPO/data-bin/wmt18_en_de
 
-
-# copy data as is for generation without tag
-cp $DATA_TXT/valid.en $QA_TEXT/no_tag/valid_no_tag.en
-cp $DATA_TXT/test.en $QA_TEXT/no_tag/test_no_tag.en
-
-# binarizing data without tag
-fairseq-preprocess \
-    --only-source \
-    --source-lang en --target-lang de \
-    --joined-dictionary --srcdict $DATA_BIN/dict.en.txt \
-    --validpref $QA_TEXT/no_tag/valid_no_tag \
-    --testpref $QA_TEXT/no_tag/test_no_tag \
-    --destdir $QA_BIN/no_tag \
-    --workers 8
-cp $DATA_BIN/{code,dict.de.txt} $QA_BIN/no_tag/
-
-
-# adding <BT> tag for generation with tag
-cat $DATA_TXT/valid.en | sed 's/^/<BT> /' > $QA_TEXT/tag/valid_tag.en
-cat $DATA_TXT/test.en | sed 's/^/<BT> /' > $QA_TEXT/tag/test_tag.en
-
-# binarizing data with tag
-fairseq-preprocess \
-    --only-source \
-    --source-lang en --target-lang de \
-    --joined-dictionary --srcdict $DATA_BIN/dict.en.txt \
-    --validpref $QA_TEXT/tag/valid_tag \
-    --testpref $QA_TEXT/tag/test_tag \
-    --destdir $QA_BIN/tag \
-    --workers 8
-cp $DATA_BIN/{code,dict.de.txt} $QA_BIN/tag/
-
-
-# copying the human translations
-cp $DATA_TXT/valid.de $QUALITATIVE_ANALYSIS/valid/valid_ht.bpe.de
-cp $DATA_TXT/test.de $QUALITATIVE_ANALYSIS/test/test_ht.bpe.de
-
-cat $DATA_TXT/valid.de \
+# newstest2014 as validation set without tag
+sacrebleu -t wmt14 -l en-de --echo src \
+| tee $QUALITATIVE_ANALYSIS/valid/valid_newstest2014_source.postprocessed.en \
+| sacremoses tokenize -a -l en -q \
+| python $BPEROOT/apply_bpe.py -c $REPO/data-bin/wmt18_en_de/code \
+| tee $QUALITATIVE_ANALYSIS/valid/valid_newstest2014_source.bpe.en \
+| fairseq-interactive $REPO/data-bin/wmt18_en_de \
+    --path $CHECKPOINT_DIR/checkpoint.avg10.pt \
+    -s en -t de \
+    --beam 5 --buffer-size 1024 --max-tokens 8000 \
+| grep ^H- \
+| cut -f 3- \
+| tee $QUALITATIVE_ANALYSIS/valid/valid_newstest2014_no_tag.bpe.de \
 | sed "s/\@\@ //g" \
-| perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/valid/valid_ht.postprocessed.de
+| sacremoses detokenize -l de -q \
+> $QUALITATIVE_ANALYSIS/valid/valid_newstest2014_no_tag.postprocessed.de
 
-cat $DATA_TXT/test.de \
+# newstest2014 as validation set with tag
+sacrebleu -t wmt14 -l en-de --echo src \
+| sacremoses tokenize -a -l en -q \
+| python $BPEROOT/apply_bpe.py -c $REPO/data-bin/wmt18_en_de/code \
+| sed 's/^/<BT> /' \
+| fairseq-interactive $REPO/data-bin/wmt18_en_de \
+    --path $CHECKPOINT_DIR/checkpoint.avg10.pt \
+    -s en -t de \
+    --beam 5 --buffer-size 1024 --max-tokens 8000 \
+| grep ^H- \
+| cut -f 3- \
+| tee $QUALITATIVE_ANALYSIS/valid/valid_newstest2014_tag.bpe.de \
 | sed "s/\@\@ //g" \
-| perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/test/test_ht.postprocessed.de
+| sacremoses detokenize -l de -q \
+> $QUALITATIVE_ANALYSIS/valid/valid_newstest2014_tag.postprocessed.de
 
 
-# copying the source sentences
-cp $DATA_TXT/valid.en $QUALITATIVE_ANALYSIS/valid/valid_source.bpe.en
-cp $DATA_TXT/test.en $QUALITATIVE_ANALYSIS/test/test_source.bpe.en
-
-cat $DATA_TXT/valid.en \
+# newstest2017 test set without tag
+sacrebleu -t wmt17 -l en-de --echo src \
+| tee $QUALITATIVE_ANALYSIS/test/test_newstest2017_source.postprocessed.en \
+| sacremoses tokenize -a -l en -q \
+| python $BPEROOT/apply_bpe.py -c $REPO/data-bin/wmt18_en_de/code \
+| tee $QUALITATIVE_ANALYSIS/test/test_newstest2017_source.bpe.en \
+| fairseq-interactive $REPO/data-bin/wmt18_en_de \
+    --path $CHECKPOINT_DIR/checkpoint.avg10.pt \
+    -s en -t de \
+    --beam 5 --buffer-size 1024 --max-tokens 8000 \
+| grep ^H- \
+| cut -f 3- \
+| tee $QUALITATIVE_ANALYSIS/test/test_newstest2017_no_tag.bpe.de \
 | sed "s/\@\@ //g" \
-| perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/valid/valid_source.postprocessed.en
+| sacremoses detokenize -l de -q \
+> $QUALITATIVE_ANALYSIS/test/test_newstest2017_no_tag.postprocessed.de
 
-cat $DATA_TXT/test.en \
+# newstest2017 test set with tag
+sacrebleu -t wmt17 -l en-de --echo src \
+| sacremoses tokenize -a -l en -q \
+| python $BPEROOT/apply_bpe.py -c $REPO/data-bin/wmt18_en_de/code \
+| sed 's/^/<BT> /' \
+| fairseq-interactive $REPO/data-bin/wmt18_en_de \
+    --path $CHECKPOINT_DIR/checkpoint.avg10.pt \
+    -s en -t de \
+    --beam 5 --buffer-size 1024 --max-tokens 8000 \
+| grep ^H- \
+| cut -f 3- \
+| tee $QUALITATIVE_ANALYSIS/test/test_newstest2017_tag.bpe.de \
 | sed "s/\@\@ //g" \
-| perl $MOSES/scripts/tokenizer/detokenizer.perl -q \
-> $QUALITATIVE_ANALYSIS/test/test_source.postprocessed.en
+| sacremoses detokenize -l de -q \
+> $QUALITATIVE_ANALYSIS/test/test_newstest2017_tag.postprocessed.de
+
+
+# copy reference translations
+sacrebleu -t wmt14 -l en-de --echo ref \
+| tee $QUALITATIVE_ANALYSIS/valid/valid_newstest2014_ht.postprocessed.de \
+| sacremoses tokenize -a -l de -q \
+| python $BPEROOT/apply_bpe.py -c $REPO/data-bin/wmt18_en_de/code \
+> $QUALITATIVE_ANALYSIS/valid/valid_newstest2014_ht.bpe.de
+
+sacrebleu -t wmt17 -l en-de --echo ref \
+| tee $QUALITATIVE_ANALYSIS/test/test_newstest2017_ht.postprocessed.de \
+| sacremoses tokenize -a -l de -q \
+| python $BPEROOT/apply_bpe.py -c $REPO/data-bin/wmt18_en_de/code \
+> $QUALITATIVE_ANALYSIS/test/test_newstest2017_ht.bpe.de

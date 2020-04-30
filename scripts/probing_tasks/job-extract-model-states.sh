@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=16G
+#SBATCH --mem=32G
 #SBATCH --gres=gpu:Tesla-V100:1
 #SBATCH --qos=vesta
 #SBATCH --partition=volta
@@ -23,6 +23,7 @@ CHECKPOINT_DIR_NOISED=$REPO/checkpoints/checkpoints_en_de_parallel_plus_bt_noise
 BIBEAM=$REPO/model_states/en_de_parallel_plus_bt_beam
 BINOISED=$REPO/model_states/en_de_parallel_plus_bt_noised
 
+
 # task 1: bitext vs beam back-translation (beamBT)
 
 fairseq-states $BITEXT/train.en --path $CHECKPOINT_DIR_BEAM/checkpoint.avg10.pt \
@@ -36,6 +37,7 @@ fairseq-states $BEAM/train.en --path $CHECKPOINT_DIR_BEAM/checkpoint.avg10.pt \
 
 fairseq-states $BEAM/test.en --path $CHECKPOINT_DIR_BEAM/checkpoint.avg10.pt \
     --states-dir $BIBEAM/beam/test
+
 
 # task 2: bitext vs noised back-translation (noisedBT)
 

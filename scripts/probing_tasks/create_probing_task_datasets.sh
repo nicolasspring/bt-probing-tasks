@@ -6,15 +6,15 @@ REPO=`dirname "$SCRIPTS"`
 
 cd $REPO
 
+PT_DATA=$REPO/probing_task_data
 BITEXT_OUT=$REPO/probing_task_data/bitext
 BEAM_OUT=$REPO/probing_task_data/beam
 NOISED_OUT=$REPO/probing_task_data/noised
 
-mkdir -p $REPO/probing_task_data/bitext
-mkdir -p $REPO/probing_task_data/{beam,noised}/tmp/bt
-mkdir -p $REPO/probing_task_data/{beam,noised}/data-bin/{train,test}
+mkdir -p $PT_DATA/bitext $PT_DATA/{beam,noised}/tmp/bt
 
 WMT18_DATA=$REPO/data_prep/wmt18_en_de
+BPEROOT=$REPO/data_prep/subword-nmt/subword_nmt
 
 # size of training set is TRAIN_SIZE*2 (TRAIN_SIZE sentences of bitext and bt each)
 TRAIN_SIZE=25000
@@ -31,9 +31,19 @@ get_seeded_random()
 shuf -n $TRAIN_SIZE --random-source=<(get_seeded_random 42) $WMT18_DATA/train.en > $BITEXT_OUT/train.en
 shuf -n $TRAIN_SIZE --random-source=<(get_seeded_random 42) $WMT18_DATA/train.de > $BEAM_OUT/tmp/train.de
 cp $BEAM_OUT/tmp/train.de $NOISED_OUT/tmp/train.de
-cp $WMT18_DATA/test.en $BITEXT_OUT/test.en
-cp $WMT18_DATA/test.de $BEAM_OUT/tmp/test.de
-cp $WMT18_DATA/test.de $NOISED_OUT/tmp/test.de
+
+# get bitext testset
+sacrebleu -t wmt17 -l en-de --echo src \
+| sacremoses tokenize -a -l en -q \
+| python $BPEROOT/apply_bpe.py -c $REPO/data-bin/wmt18_en_de/code \
+> $BITEXT_OUT/test.en
+
+# prepare german side of bitext test set for back-translation
+sacrebleu -t wmt17 -l en-de --echo ref \
+| sacremoses tokenize -a -l de -q \
+| python $BPEROOT/apply_bpe.py -c $REPO/data-bin/wmt18_en_de/code \
+> $BEAM_OUT/tmp/test.de
+cp $BEAM_OUT/tmp/test.de $NOISED_OUT/tmp/test.de
 
 module load volta cuda/10.0
 # creates the back-translated probing task datasets

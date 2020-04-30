@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=01:00:00
+#SBATCH --time=00:30:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16G
 #SBATCH --gres=gpu:Tesla-V100:1
@@ -18,69 +18,42 @@ cd $REPO
 BEAM_OUT=$REPO/probing_task_data/beam
 NOISED_OUT=$REPO/probing_task_data/noised
 
-WMT18_DATA=$REPO/data_prep/wmt18_en_de
 CHECKPOINT_DIR=$REPO/checkpoints/checkpoints_de_en_parallel
 
 
-# binarize train and test set
-# (this step is identical for beamBT and noisedBT and thus will only be performed once)
+# back-translating training set
 
-fairseq-preprocess \
-    --only-source \
-    --source-lang de --target-lang en \
-    --joined-dictionary \
-    --srcdict $REPO/data-bin/wmt18_en_de/dict.de.txt \
-    --testpref $BEAM_OUT/tmp/train \
-    --destdir $BEAM_OUT/data-bin/train \
-    --workers 1
-cp $REPO/data-bin/wmt18_en_de/dict.en.txt $BEAM_OUT/data-bin/train/
-cp $BEAM_OUT/data-bin/train/* $NOISED_OUT/data-bin/train/
-
-fairseq-preprocess \
-    --only-source \
-    --source-lang de --target-lang en \
-    --joined-dictionary \
-    --srcdict $REPO/data-bin/wmt18_en_de/dict.de.txt \
-    --testpref $BEAM_OUT/tmp/test \
-    --destdir $BEAM_OUT/data-bin/test \
-    --workers 1
-cp $REPO/data-bin/wmt18_en_de/dict.en.txt $BEAM_OUT/data-bin/test/
-cp $BEAM_OUT/data-bin/test/* $NOISED_OUT/data-bin/test/
-
-
-# generating and extracting back-translations for the train and test set
-# (this step is identical for beamBT and noisedBT and thus will only be performed once)
-
-fairseq-generate --fp16 \
-    $BEAM_OUT/data-bin/train \
+cat $BEAM_OUT/tmp/train.de \
+| fairseq-interactive $REPO/data-bin/wmt18_en_de \
     --path $CHECKPOINT_DIR/checkpoint_best.pt \
-    --skip-invalid-size-inputs-valid-test \
-    --max-tokens 4096 \
-    --beam 5 \
-| tee $BEAM_OUT/tmp/bt_train.out \
+    -s de -t en \
+    --beam 5 --buffer-size 1024 --max-tokens 8000 \
 | grep -P '^H-' \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
 > $BEAM_OUT/tmp/bt/bt_beam_train.en
-cp $BEAM_OUT/tmp/bt_train.out $NOISED_OUT/tmp/bt_train.out
+# this is the final step for the beam search dataset
 cp $BEAM_OUT/tmp/bt/bt_beam_train.en $BEAM_OUT/train.en
+# for the noised dataset, noise will be applied after
 cp $BEAM_OUT/tmp/bt/bt_beam_train.en $NOISED_OUT/tmp/bt/bt_beam_train.en
 
-fairseq-generate --fp16 \
-    $BEAM_OUT/data-bin/test \
+
+# back-translating test set
+
+cat $BEAM_OUT/tmp/test.de \
+| fairseq-interactive $REPO/data-bin/wmt18_en_de \
     --path $CHECKPOINT_DIR/checkpoint_best.pt \
-    --skip-invalid-size-inputs-valid-test \
-    --max-tokens 4096 \
-    --beam 5 \
-| tee $BEAM_OUT/tmp/bt_test.out \
+    -s de -t en \
+    --beam 5 --buffer-size 1024 --max-tokens 8000 \
 | grep -P '^H-' \
 | awk -F'H-' '{print $2}' \
 | sort -n \
 | cut -f 3 \
 > $BEAM_OUT/tmp/bt/bt_beam_test.en
-cp $BEAM_OUT/tmp/bt_test.out $NOISED_OUT/tmp/bt_test.out
+# this is the final step for the beam search dataset
 cp $BEAM_OUT/tmp/bt/bt_beam_test.en $BEAM_OUT/test.en
+# for the noised dataset, noise will be applied after
 cp $BEAM_OUT/tmp/bt/bt_beam_test.en $NOISED_OUT/tmp/bt/bt_beam_test.en
 
 

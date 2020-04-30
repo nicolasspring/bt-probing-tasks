@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --time=12:00:00
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=256G
 #SBATCH --partition=hpc
 
@@ -16,14 +16,14 @@ OUT_PROBING_BEAM=$REPO/probing_tasks/genuine_vs_beamBT
 OUT_PROBING_NOISED=$REPO/probing_tasks/genuine_vs_noisedBT
 
 echo "Experiment genuine vs beamBT"
-python $REPO/scripts/probing_tasks/run_experiment.py \
+python -u $REPO/scripts/probing_tasks/run_experiment.py \
         --genuine $BIBEAM/bitext/ \
         --bt $BIBEAM/beam/ \
         --bt-name beamBT \
         --out-dir $OUT_PROBING_BEAM
 
 echo "Experiment genuine vs noisedBT"
-python $REPO/scripts/probing_tasks/run_experiment.py \
+python -u $REPO/scripts/probing_tasks/run_experiment.py \
         --genuine $BINOISED/bitext/ \
         --bt $BINOISED/noised/ \
         --bt-name noisedBT \

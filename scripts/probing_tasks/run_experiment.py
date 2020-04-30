@@ -155,7 +155,8 @@ def probing_task(X_train: pd.DataFrame,
     linear_clf_params = {'C': 0.0001,
                          'max_iter': 100,
                          'solver': 'liblinear',
-                         'tol': 1e-4
+                         'tol': 1e-4,
+                         'verbose':100
                          }
     mlp_clf_params = {'activation': 'relu',
                       'alpha': 0.0001,
@@ -163,7 +164,11 @@ def probing_task(X_train: pd.DataFrame,
                       'epsilon': 10e-8,
                       'hidden_layer_sizes': (100,),
                       'learning_rate_init': 0.0001,
-                      'solver': 'lbfgs'
+                      'solver': 'adam',
+                      'early_stopping':True,
+                      'n_iter_no_change':10,
+                      'validation_fraction':0.02,
+                      'verbose':True
                       }
     linear_clf = LogisticRegression(**linear_clf_params)
     mlp_clf = MLPClassifier(**mlp_clf_params)
@@ -172,13 +177,14 @@ def probing_task(X_train: pd.DataFrame,
 
     for clf in [linear_clf, mlp_clf]:
         clf_name = str(clf).split('(')[0]
-        logger.info(f'fitting {clf_name} classifier on {bt_name} {experiment}...')
+        logger.info(f'fitting {clf_name} classifier on {bt_name} with {experiment}...')
         clf.fit(X_train, y_train)
         with open(os.path.join(out_dir, f'clf_{experiment}_{bt_name}_{clf_name}_fitted.pkl'), 'wb') as outfile:
             pickle.dump(clf, outfile)
         logger.info('predicting...')
         preds = clf.predict(X_test)
         acc = accuracy_score(y_test, preds)
+        logger.info(f'Accuracy of {clf_name} on {bt_name} with {experiment}: {acc}')
         results.loc[len(results)] = [clf_name, experiment, bt_name, acc]
 
     print(f'Results for experiment {bt_name} with {experiment}:')
@@ -226,14 +232,14 @@ def main(args: argparse.Namespace):
     averaged_X_train, averaged_y_train = create_dataset(averaged_genuine_train, averaged_bt_train)
     averaged_X_test, averaged_y_test = create_dataset(averaged_genuine_test, averaged_bt_test)
 
-    padding_results = probing_task(averaged_X_train,
-                                   averaged_y_train,
-                                   averaged_X_test,
-                                   averaged_y_test,
-                                   args.bt_name,
-                                   'averaging',
-                                   out_dir,
-                                   logger)
+    averaging_results = probing_task(averaged_X_train,
+                                     averaged_y_train,
+                                     averaged_X_test,
+                                     averaged_y_test,
+                                     args.bt_name,
+                                     'averaging',
+                                     out_dir,
+                                     logger)
 
 
 if __name__ == '__main__':

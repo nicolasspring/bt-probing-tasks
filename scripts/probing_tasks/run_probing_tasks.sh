@@ -12,9 +12,8 @@ BINOISED=$REPO/model_states/en_de_parallel_plus_bt_noised
 OUT_PROBING_BEAM=$REPO/probing_tasks/genuine_vs_beamBT
 OUT_PROBING_NOISED=$REPO/probing_tasks/genuine_vs_noisedBT
 
-mkdir -p $REPO/probing_tasks/genuine_vs_beamBT
-mkdir -p $REPO/probing_tasks/genuine_vs_noisedBT
+mkdir -p $OUT_PROBING_BEAM $OUT_PROBING_NOISED
 
 module load hpc
 # runs the two probing tasks
-sbatch -D $REPO -o slurm-%j-run-probing-tasks.out $SBT/job-run-probing-tasks.sh $REPO
+sbatch -D $REPO -o slurm-%j-run-probing-tasks.out $SPT/job-run-probing-tasks.sh $REPO

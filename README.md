@@ -250,7 +250,9 @@ bash scripts/probing_tasks/run_probing_tasks.sh
 
 This script creates a directory each in `./probing_tasks/` for the two experiments. The directories contain CSV files with the results and the pickled classifiers.
 
-### 9. Qualitative Analysis
+
+
+### 9. Analyzing Generation With and Without a Tag
 
 To perform qualitative analysis on the taggedBT model, generate back-translations with and without the `<BT>` tag:
 
@@ -259,3 +261,13 @@ bash scripts/qualitative_analysis/generate_qualitative_analysis_data.sh
 ```
 
 This script translates the validation and test sets and creates raw and postprocessed output files.
+
+To calculate BLEU scores on the validation and test sets:
+
+```bash
+# newstest2014 was used as the validation set
+bash scripts/evaluation/translate_newstest2014_taggedBT.sh
+# newstest2017 was used as the test set
+bash scripts/evaluation/translate_newstest2017_taggedBT.sh
+```
+

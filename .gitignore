@@ -1,23 +1,23 @@
 # virtual environment
-venvs/
+/venvs/
 
 # software
-software/
-subword-nmt/
+/software/
+/subword-nmt/
 
 # directories for data in binarized and text form
-backtranslations/
-data-bin/
-data_prep/
-probing_task_data/
-qualitative_analysis/
+/backtranslations/
+/data-bin/
+/data_prep/
+/probing_task_data/
+/qualitative_analysis/
 
 # model checkpoints and states
-checkpoints/
-model_states/
+/checkpoints/
+/model_states/
 
 # probing task output files
-probing_tasks/
+/probing_tasks/
 
 # slurm output files
-slurm-*
+/slurm-*

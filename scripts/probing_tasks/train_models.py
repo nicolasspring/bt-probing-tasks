@@ -14,6 +14,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.neural_network import MLPClassifier
 from typing import List, Tuple, Dict
 
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('--genuine', type=str, required=True,
@@ -28,17 +29,19 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
-def get_max_train_seq_len(directories: List[str], logger: logging.Logger) -> int:
+def get_max_seq_len(directories: List[str], logger: logging.Logger) -> int:
     '''
-    returns the maximum sequence length of the train states.
+    returns the maximum sequence length in directories containing model states.
 
     Args:
         directories     list of directory paths
         logger          a logging.Logger instance
+
+    Returns:
+        max_len         the maximum sequence length
     '''
     all_files = []
     for directory in directories:
-        directory = os.path.join(directory, 'train')
         states_dir, _, filenames = next(os.walk(os.path.abspath(directory)))
         for filename in filenames:
             all_files.append(os.path.join(states_dir, filename))
@@ -58,6 +61,9 @@ def pad_states(directory: str, max_len: int, logger: logging.Logger) -> torch.Te
         directory   a directory containing saved model states
         max_len     the maximum sequence time steps
         logger      a logging.Logger instance
+
+    Returns:
+        X           the padded feature matrix
     '''
     logger.info(f'reading tensors from {directory}')
     states_dir, _, filenames = next(os.walk(os.path.abspath(directory)))
@@ -89,6 +95,9 @@ def average_states(directory: str, logger: logging.Logger) -> torch.Tensor:
     Args:
         directory   a directory containing saved model states
         logger      a logging.Logger instance
+
+    Returns:
+        X           the averaged feature matrix
     '''
     logger.info(f'reading tensors from {directory}')
     states_dir, _, filenames = next(os.walk(os.path.abspath(directory)))
@@ -131,22 +140,18 @@ def create_dataset(source_matrix: torch.Tensor, bt_matrix: torch.Tensor) -> Tupl
     return X, y
 
 
-def probing_task(X_train: pd.DataFrame,
+def train_models(X_train: pd.DataFrame,
                  y_train: pd.DataFrame,
-                 X_test: pd.DataFrame,
-                 y_test: pd.DataFrame,
                  bt_name: str,
                  experiment: str,
                  out_dir: str,
-                 logger: logging.Logger) -> pd.DataFrame:
+                 logger: logging.Logger):
     '''
-    Runs a probing task experiment.
+    Fits classifiers for a probing task experiment.
 
     Args:
         X_train     training features
         y_train     training labels
-        X_test      test features
-        y_test      test labels
         bt_name     name of the bt dataset used for naming files
         experiment  the name of the experiment
         out_dir     output directory
@@ -173,24 +178,12 @@ def probing_task(X_train: pd.DataFrame,
     linear_clf = LogisticRegression(**linear_clf_params)
     mlp_clf = MLPClassifier(**mlp_clf_params)
 
-    results = pd.DataFrame(columns=['classifier', 'states_operation', 'bt', 'accuracy'])
-
     for clf in [linear_clf, mlp_clf]:
         clf_name = str(clf).split('(')[0]
         logger.info(f'fitting {clf_name} classifier on {bt_name} with {experiment}...')
         clf.fit(X_train, y_train)
         with open(os.path.join(out_dir, f'clf_{experiment}_{bt_name}_{clf_name}_fitted.pkl'), 'wb') as outfile:
             pickle.dump(clf, outfile)
-        logger.info('predicting...')
-        preds = clf.predict(X_test)
-        acc = accuracy_score(y_test, preds)
-        logger.info(f'Accuracy of {clf_name} on {bt_name} with {experiment}: {acc}')
-        results.loc[len(results)] = [clf_name, experiment, bt_name, acc]
-
-    print(f'Results for experiment {bt_name} with {experiment}:')
-    print(results)
-    results.to_csv(os.path.join(out_dir, f'results_{experiment}_{bt_name}.csv'), index=False)
-    return results
 
 
 def main(args: argparse.Namespace):
@@ -199,47 +192,37 @@ def main(args: argparse.Namespace):
         datefmt='%Y-%m-%d %H:%M:%S',
         level=logging.INFO,
     )
-    logger = logging.getLogger('run_experiment.py')
+    logger = logging.getLogger('train_models.py')
 
     out_dir = os.path.abspath(args.out_dir)
 
-    max_len = get_max_train_seq_len([args.genuine, args.bt], logger)
+    max_len = get_max_seq_len([args.genuine, args.bt], logger)
 
-    # padding experiment
-    padded_genuine_train = pad_states(os.path.join(args.genuine, 'train'), max_len, logger)
-    padded_genuine_test = pad_states(os.path.join(args.genuine, 'test'), max_len, logger)
-    padded_bt_train = pad_states(os.path.join(args.bt, 'train'), max_len, logger)
-    padded_bt_test = pad_states(os.path.join(args.bt, 'test'), max_len, logger)
+    # training for padding experiment
+    padded_genuine_train = pad_states(os.path.join(args.genuine), max_len, logger)
+    padded_bt_train = pad_states(os.path.join(args.bt), max_len, logger)
 
     padded_X_train, padded_y_train = create_dataset(padded_genuine_train, padded_bt_train)
-    padded_X_test, padded_y_test = create_dataset(padded_genuine_test, padded_bt_test)
 
-    padding_results = probing_task(padded_X_train,
-                                   padded_y_train,
-                                   padded_X_test,
-                                   padded_y_test,
-                                   args.bt_name,
-                                   'padding',
-                                   out_dir,
-                                   logger)
+    train_models(padded_X_train,
+                 padded_y_train,
+                 args.bt_name,
+                 'padding',
+                 out_dir,
+                 logger)
 
-    # averaging experiment
-    averaged_genuine_train = average_states(os.path.join(args.genuine, 'train'), logger)
-    averaged_genuine_test = average_states(os.path.join(args.genuine, 'test'), logger)
-    averaged_bt_train = average_states(os.path.join(args.bt, 'train'), logger)
-    averaged_bt_test = average_states(os.path.join(args.bt, 'test'), logger)
+    # training for averaging experiment
+    averaged_genuine_train = average_states(os.path.join(args.genuine), logger)
+    averaged_bt_train = average_states(os.path.join(args.bt), logger)
 
     averaged_X_train, averaged_y_train = create_dataset(averaged_genuine_train, averaged_bt_train)
-    averaged_X_test, averaged_y_test = create_dataset(averaged_genuine_test, averaged_bt_test)
 
-    averaging_results = probing_task(averaged_X_train,
-                                     averaged_y_train,
-                                     averaged_X_test,
-                                     averaged_y_test,
-                                     args.bt_name,
-                                     'averaging',
-                                     out_dir,
-                                     logger)
+    train_models(averaged_X_train,
+                 averaged_y_train,
+                 args.bt_name,
+                 'averaging',
+                 out_dir,
+                 logger)
 
 
 if __name__ == '__main__':

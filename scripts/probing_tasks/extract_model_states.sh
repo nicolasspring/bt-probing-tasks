@@ -9,8 +9,8 @@ cd $REPO
 BIBEAM=$REPO/model_states/en_de_parallel_plus_bt_beam
 BINOISED=$REPO/model_states/en_de_parallel_plus_bt_noised
 
-mkdir -p $BIBEAM/{bitext,beam}/{train,test}
-mkdir -p $BINOISED/{bitext,noised}/{train,test}
+mkdir -p $BIBEAM/{bitext,beam}
+mkdir -p $BINOISED/{bitext,noised}
 
 module load volta cuda/10.0
 # extracts model states for probing task data

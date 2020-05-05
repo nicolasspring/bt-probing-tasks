@@ -216,27 +216,19 @@ Training set for **genuine source text vs. back-translation** :
 
 ```
 python scripts/checks/check_state_shapes.py \
-	model_states/en_de_parallel_plus_bt_beam/bitext/train/ \
-	model_states/en_de_parallel_plus_bt_beam/beam/train/
+	model_states/en_de_parallel_plus_bt_beam/bitext/ \
+	model_states/en_de_parallel_plus_bt_beam/beam/
 ```
 
 Training set for **genuine source text vs. noised back-translation** :
 
 ```
 python scripts/checks/check_state_shapes.py \
-	model_states/en_de_parallel_plus_bt_noised/bitext/train/ \
-	model_states/en_de_parallel_plus_bt_noised/noised/train/
+	model_states/en_de_parallel_plus_bt_noised/bitext/ \
+	model_states/en_de_parallel_plus_bt_noised/noised/
 ```
 
-Checking the test sets:
-
-```
-python scripts/checks/check_state_shapes.py \
-	model_states/en_de_parallel_plus_bt_beam/bitext/test/ \
-	model_states/en_de_parallel_plus_bt_beam/beam/test/ \
-	model_states/en_de_parallel_plus_bt_noised/bitext/test/ \
-	model_states/en_de_parallel_plus_bt_noised/noised/test/
-```
+In the script `scripts/probing_tasks/run_probing_tasks.sh`, please adjust the flag `--max-len` to the maximum sequence length. The default value is 246, but depending on the random split, your sequence length may be different.
 
 
 

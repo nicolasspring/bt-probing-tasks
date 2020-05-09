@@ -8,6 +8,7 @@ This repository contains the code necessary to reproduce the experiments and res
 
 - [noisy-text](https://github.com/valentinmace/noisy-text) by Valentin Macé was used to add noise to back-translations.
 - [fairseq-states](https://github.com/nicolasspring/fairseq-states/), a fork of [fairseq](https://github.com/pytorch/fairseq) with added state saving functionality, was used to extract model states.
+- The Perl scripts in [diversity](https://github.com/emjotde/diversity) by Marcin Junczys-Dowmunt were used to calculate values for lexical diversity.
 
 
 
@@ -18,7 +19,7 @@ This repository contains the code necessary to reproduce the experiments and res
 
 
 
-## How to Reproduce the Results
+## Reproducing the Results
 
 ```
 git clone https://github.com/nicolasspring/bt-probing-tasks/
@@ -246,6 +247,8 @@ This script creates a directory each in `./probing_tasks/` for the two experimen
 
 ### 9. Analyzing Generation With and Without a Tag
 
+#### BLEU Scores
+
 To perform qualitative analysis on the taggedBT model, generate back-translations with and without the `<BT>` tag:
 
 ```bash
@@ -262,4 +265,35 @@ bash scripts/evaluation/translate_newstest2014_taggedBT.sh
 # newstest2017 was used as the test set
 bash scripts/evaluation/translate_newstest2017_taggedBT.sh
 ```
+
+#### Lexical Diversity
+
+To calculate copy-aware lexical diversity on newstest2017:
+
+```bash
+# translation generated with tag
+# type-token ratio (TTR)
+cat qualitative_analysis/test/test_newstest2017_tag.postprocessed.de \
+| perl software/diversity/scripts/ttr.pl de no_counts \
+	qualitative_analysis/test/test_newstest2017_source.postprocessed.en
+
+# measure of textual lexical diversity (MTLD)
+cat qualitative_analysis/test/test_newstest2017_tag.postprocessed.de \
+| perl software/diversity/scripts/mtld.pl de no_counts \
+	qualitative_analysis/test/test_newstest2017_source.postprocessed.en
+
+
+# translation generated without the tag
+# TTR
+cat qualitative_analysis/test/test_newstest2017_no_tag.postprocessed.de \
+| perl software/diversity/scripts/ttr.pl de no_counts \
+	qualitative_analysis/test/test_newstest2017_source.postprocessed.en
+
+# MTLD
+cat qualitative_analysis/test/test_newstest2017_no_tag.postprocessed.de \
+| perl software/diversity/scripts/mtld.pl de no_counts \
+	qualitative_analysis/test/test_newstest2017_source.postprocessed.en
+```
+
+ `no_counts` occupies the argument slot used for an English language word count list. When working with German, this argument does no influence the script.
 

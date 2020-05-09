@@ -4,6 +4,8 @@
 
 import argparse
 import logging
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import pickle
 import os
@@ -13,9 +15,9 @@ from csv import QUOTE_NONNUMERIC
 from fairseq.hub_utils import GeneratorHubInterface
 from fairseq.models import BaseFairseqModel
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.neural_network import MLPClassifier
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Iterable, List, Optional, Union
 
 
 def parse_args() -> argparse.Namespace:
@@ -110,6 +112,25 @@ def average_state(tensor: torch.Tensor) -> torch.Tensor:
     out_tensor = tensor.mean(0)
     return out_tensor
 
+
+def save_confusion_matrix(y_true: List[int],
+                          y_pred: List[int],
+                          display_labels: np.ndarray,
+                          outpath: str):
+    '''
+    plots a confusion matrix and saves it to the specified path
+
+    Args:
+        y_true          list of true labels
+        y_pred          list of predicted labels
+        display_labels  display labels for the plot
+        outpath         path for saving the plot
+
+    '''
+    cm = confusion_matrix(y_true, y_pred)
+    disp = ConfusionMatrixDisplay(cm, display_labels)
+    _ = disp.plot(values_format='.4g')
+    plt.savefig(outpath, format='png', bbox_inches='tight')
 
 def main(args: argparse.Namespace):
     logging.basicConfig(
@@ -236,9 +257,27 @@ def main(args: argparse.Namespace):
     results.loc[len(results)] = [clf_name(clf_nonlinear_pad), 'padding', args.bt_name, nonlin_pad_acc]
     print(results)
 
+    # saving tables
     results.to_csv(os.path.join(args.out_dir, f'results_genuine_vs_{args.bt_name}.csv'), index=False, quoting=QUOTE_NONNUMERIC)
     all_sents.to_csv(os.path.join(args.out_dir, f'all_sents_genuine_vs_{args.bt_name}.csv'), index=False, quoting=QUOTE_NONNUMERIC)
 
+    # saving confusion matrices
+    save_confusion_matrix(true_labels,
+                          linear_av_preds,
+                          clf_linear_av.classes_,
+                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_linear_av)}_averaging.png'))
+    save_confusion_matrix(true_labels,
+                          linear_pad_preds,
+                          clf_linear_pad.classes_,
+                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_linear_pad)}_padding.png'))
+    save_confusion_matrix(true_labels,
+                          nonlinear_av_preds,
+                          clf_nonlinear_av.classes_,
+                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_nonlinear_av)}_averaging.png'))
+    save_confusion_matrix(true_labels,
+                          nonlinear_pad_preds,
+                          clf_nonlinear_pad.classes_,
+                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_nonlinear_pad)}_padding.png'))
 
 if __name__ == '__main__':
     args = parse_args()

@@ -297,3 +297,23 @@ cat qualitative_analysis/test/test_newstest2017_no_tag.postprocessed.de \
 
  `no_counts` occupies the argument slot used for an English language word count list. When working with German, this argument does no influence the script.
 
+#### Alignment Distances
+
+To train a `fast_align` model on the parallel data and align the wmt17 data:
+
+```bash
+bash scripts/qualitative_analysis/align_data.sh
+```
+
+To calculate the normalized distance between corresponding words for the translations:
+
+```bash
+# translation generated with tag
+python scripts/qualitative_analysis/measure_parallelism.py \
+	-i qualitative_analysis/alignment/output/test_wmt17.aligned.en-de_tag
+
+# translation generated without the tag
+python scripts/qualitative_analysis/measure_parallelism.py \
+	-i qualitative_analysis/alignment/output/test_wmt17.aligned.en-de_no_tag
+```
+

@@ -24,3 +24,15 @@ cd ..
 
 # downloading noisy-text
 git clone https://github.com/valentinmace/noisy-text
+
+# installing fast_align
+git clone https://github.com/clab/fast_align
+cd fast_align
+mkdir build
+cd build
+cmake ..
+make
+
+# scripts for calculating TTR and MTLD
+cd $REPO/software
+git clone https://github.com/emjotde/diversity

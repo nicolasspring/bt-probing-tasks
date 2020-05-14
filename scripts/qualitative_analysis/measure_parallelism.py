@@ -56,7 +56,7 @@ def normalized_distance_sentence(line: str) -> float:
 
 
 def main(args: argparse.Namespace):
-    print(f'normalized distance of alignments: {normalized_distance_document(args.input)}')
+    print(round(normalized_distance_document(args.input), 4))
 
 
 if __name__ == '__main__':

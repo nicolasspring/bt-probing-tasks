@@ -272,65 +272,17 @@ For newstest2019, scores are calculated on the WMT reference translation as well
 
 #### Lexical Diversity
 
-To calculate copy-aware lexical diversity on newstest2017:
+To calculate copy-aware lexical diversity for newstest2014, newstest2017 and newstest2019:
 
 ```bash
-# translation generated with tag
-# type-token ratio (TTR)
-cat qualitative_analysis/newstest2017/newstest2017_tag.postprocessed.de \
-| perl software/diversity/scripts/ttr.pl de no_counts \
-	qualitative_analysis/newstest2017/newstest2017_source.postprocessed.en
-
-# measure of textual lexical diversity (MTLD)
-cat qualitative_analysis/newstest2017/newstest2017_tag.postprocessed.de \
-| perl software/diversity/scripts/mtld.pl de no_counts \
-	qualitative_analysis/newstest2017/newstest2017_source.postprocessed.en
-
-
-# translation generated without the tag
-# TTR
-cat qualitative_analysis/newstest2017/newstest2017_no_tag.postprocessed.de \
-| perl software/diversity/scripts/ttr.pl de no_counts \
-	qualitative_analysis/newstest2017/newstest2017_source.postprocessed.en
-
-# MTLD
-cat qualitative_analysis/newstest2017/newstest2017_no_tag.postprocessed.de \
-| perl software/diversity/scripts/mtld.pl de no_counts \
-	qualitative_analysis/newstest2017/newstest2017_source.postprocessed.en
+bash scripts/qualitative_analysis/calculate_lexical_diversity.sh
 ```
 
- `no_counts` occupies the argument slot used for an English language word count list. When working with German, this argument does no influence the script.
-
-To calculate copy-aware lexical diversity on newstest2019:
-
-```bash
-# translation generated with tag
-# TTR
-cat qualitative_analysis/newstest2019/newstest2019_tag.postprocessed.de \
-| perl software/diversity/scripts/ttr.pl de no_counts \
-	qualitative_analysis/newstest2019/newstest2019_source.postprocessed.en
-
-# MTLD
-cat qualitative_analysis/newstest2019/newstest2019_tag.postprocessed.de \
-| perl software/diversity/scripts/mtld.pl de no_counts \
-	qualitative_analysis/newstest2019/newstest2019_source.postprocessed.en
-
-
-# translation generated without the tag
-# TTR
-cat qualitative_analysis/newstest2019/newstest2019_no_tag.postprocessed.de \
-| perl software/diversity/scripts/ttr.pl de no_counts \
-	qualitative_analysis/newstest2019/newstest2019_source.postprocessed.en
-
-# MTLD
-cat qualitative_analysis/newstest2019/newstest2019_no_tag.postprocessed.de \
-| perl software/diversity/scripts/mtld.pl de no_counts \
-	qualitative_analysis/newstest2019/newstest2019_source.postprocessed.en
-```
+Note: In the script, `no_counts` occupies the argument slot used for an English language word count list. When working with German, this argument does no influence the script.
 
 #### Alignment Distances
 
-To train a `fast_align` model on the parallel data and align newstest2017 and newstest2019:
+To train a `fast_align` model on the parallel data and align newstest2014, newstest2017 and newstest2019:
 
 ```bash
 bash scripts/qualitative_analysis/align_data.sh
@@ -339,6 +291,16 @@ bash scripts/qualitative_analysis/align_data.sh
 To calculate the normalized distance between corresponding words for the translations:
 
 ```bash
+# newstest2014
+# translation generated with tag
+python scripts/qualitative_analysis/measure_parallelism.py \
+    -i qualitative_analysis/alignment/output/wmt14.aligned.en-de_tag
+
+# translation generated without the tag
+python scripts/qualitative_analysis/measure_parallelism.py \
+    -i qualitative_analysis/alignment/output/wmt14.aligned.en-de_no_tag
+
+
 # newstest2017
 # translation generated with tag
 python scripts/qualitative_analysis/measure_parallelism.py \

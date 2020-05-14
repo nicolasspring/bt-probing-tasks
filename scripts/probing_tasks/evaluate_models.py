@@ -130,7 +130,7 @@ def save_confusion_matrix(y_true: List[int],
     cm = confusion_matrix(y_true, y_pred)
     disp = ConfusionMatrixDisplay(cm, display_labels)
     _ = disp.plot(values_format='.4g')
-    plt.savefig(outpath, format='png', bbox_inches='tight')
+    plt.savefig(outpath, format='pdf', bbox_inches='tight')
 
 def main(args: argparse.Namespace):
     logging.basicConfig(
@@ -265,19 +265,19 @@ def main(args: argparse.Namespace):
     save_confusion_matrix(true_labels,
                           linear_av_preds,
                           clf_linear_av.classes_,
-                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_linear_av)}_averaging.png'))
+                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_linear_av)}_averaging.pdf'))
     save_confusion_matrix(true_labels,
                           linear_pad_preds,
                           clf_linear_pad.classes_,
-                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_linear_pad)}_padding.png'))
+                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_linear_pad)}_padding.pdf'))
     save_confusion_matrix(true_labels,
                           nonlinear_av_preds,
                           clf_nonlinear_av.classes_,
-                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_nonlinear_av)}_averaging.png'))
+                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_nonlinear_av)}_averaging.pdf'))
     save_confusion_matrix(true_labels,
                           nonlinear_pad_preds,
                           clf_nonlinear_pad.classes_,
-                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_nonlinear_pad)}_padding.png'))
+                          os.path.join(args.out_dir, f'{args.bt_name}_confusion_matrix_{clf_name(clf_nonlinear_pad)}_padding.pdf'))
 
 if __name__ == '__main__':
     args = parse_args()

@@ -3,8 +3,8 @@
 SCRIPTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 REPO=`dirname "$SCRIPTS"`
 
-# needed for model training
-pip install fastBPE sacremoses subword_nmt
+# needed for model training and evaluation
+pip install fastBPE sacremoses subword_nmt sacrebleu
 
 # specific torch version
 wget https://download.pytorch.org/whl/cu100/torch-1.3.0%2Bcu100-cp36-cp36m-linux_x86_64.whl

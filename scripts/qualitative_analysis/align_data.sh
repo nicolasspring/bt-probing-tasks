@@ -30,6 +30,9 @@ paste $ALIGNMENT_TRAIN/train.tok.en $ALIGNMENT_TRAIN/train.tok.de \
 
 
 # preparing english sources
+sacrebleu -t wmt14 -l en-de --echo src \
+| sacremoses tokenize -a -l en -q \
+> $ALIGNMENT_INPUT/tmp/wmt14.tok.en
 sacrebleu -t wmt17 -l en-de --echo src \
 | sacremoses tokenize -a -l en -q \
 > $ALIGNMENT_INPUT/tmp/wmt17.tok.en
@@ -39,6 +42,12 @@ sacrebleu -t wmt19 -l en-de --echo src \
 
 
 # preparing translations
+cat $QUALITATIVE_ANALYSIS/newstest2014/newstest2014_tag.bpe.de \
+| sed "s/\@\@ //g" \
+> $ALIGNMENT_INPUT/tmp/wmt14.tok.tag.de
+cat $QUALITATIVE_ANALYSIS/newstest2014/newstest2014_no_tag.bpe.de \
+| sed "s/\@\@ //g" \
+> $ALIGNMENT_INPUT/tmp/wmt14.tok.no_tag.de
 cat $QUALITATIVE_ANALYSIS/newstest2017/newstest2017_tag.bpe.de \
 | sed "s/\@\@ //g" \
 > $ALIGNMENT_INPUT/tmp/wmt17.tok.tag.de
@@ -54,6 +63,12 @@ cat $QUALITATIVE_ANALYSIS/newstest2019/newstest2019_no_tag.bpe.de \
 
 
 # combining files
+paste $ALIGNMENT_INPUT/tmp/wmt14.tok.en $ALIGNMENT_INPUT/tmp/wmt14.tok.tag.de \
+| sed "s/\t/ ||| /g" \
+> $ALIGNMENT_INPUT/wmt14.tok.en-de_tag
+paste $ALIGNMENT_INPUT/tmp/wmt14.tok.en $ALIGNMENT_INPUT/tmp/wmt14.tok.no_tag.de \
+| sed "s/\t/ ||| /g" \
+> $ALIGNMENT_INPUT/wmt14.tok.en-de_no_tag
 paste $ALIGNMENT_INPUT/tmp/wmt17.tok.en $ALIGNMENT_INPUT/tmp/wmt17.tok.tag.de \
 | sed "s/\t/ ||| /g" \
 > $ALIGNMENT_INPUT/wmt17.tok.en-de_tag

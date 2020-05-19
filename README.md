@@ -6,9 +6,13 @@ This repository contains the code necessary to reproduce the experiments and res
 
 ## General Remarks
 
-- [noisy-text](https://github.com/valentinmace/noisy-text) by Valentin Macé was used to add noise to back-translations.
-- [fairseq-states](https://github.com/nicolasspring/fairseq-states/), a fork of [fairseq](https://github.com/pytorch/fairseq) with added state saving functionality, was used to extract model states.
 - The Perl scripts in [diversity](https://github.com/emjotde/diversity) by Marcin Junczys-Dowmunt were used to calculate values for lexical diversity.
+
+- [fairseq-states](https://github.com/nicolasspring/fairseq-states/), a fork of [fairseq](https://github.com/pytorch/fairseq) with added state saving functionality, was used to extract model states.
+
+- [fast_align](https://github.com/clab/fast_align) was used to align model translations with source texts.
+
+- [noisy-text](https://github.com/valentinmace/noisy-text) by Valentin Macé was used to add noise to back-translations.
 
 
 

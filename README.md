@@ -1,6 +1,6 @@
 # Probing Tasks for Noised Back-Translation
 
-This repository contains the code necessary to reproduce the experiments and results in the bachelor's thesis Probing "Tasks for Noised Back-Translation" by Nicolas Spring.
+This repository contains the code necessary to reproduce the experiments and results in the bachelor's thesis "Probing Tasks for Noised Back-Translation" by Nicolas Spring.
 
 
 
@@ -44,22 +44,31 @@ bash scripts/create_virtualenv.sh
 
 ### 2. Installing Software
 
+To download software and install python packages:
+
 ```bash
 bash scripts/install_packages.sh
 ```
 
-This scripts will install the following packages:
+This script will install the following packages:
 
-- `torch`
 - `fairseq`
 - `fastBPE`
-- `sacremoses`
-- `subword_nmt`
-- `numpy`
-- `scipy`
-- `sklearn`
 - `matplotlib`
+- `numpy`
 - `pandas`
+- `sacrebleu`
+- `sacremoses`
+- `scipy`
+- `scikit-learn`
+- `subword_nmt`
+- `torch`
+
+Additionally, the following software will be downloaded:
+
+- [diversity](https://github.com/emjotde/diversity)
+- [fast_align](https://github.com/clab/fast_align)
+- [noisy-text](https://github.com/valentinmace/noisy-text)
 
 
 
@@ -113,7 +122,7 @@ bash scripts/bt/extract_beam_bt.sh
 
 #### Noised Back-Translations
 
-Add noise to the back-translations obtained with beam search to create a noised back-translation dataset:
+Add noise to the back-translations to create a noised back-translation dataset:
 
 ```bash
 bash scripts/bt/generate_noised_bt.sh
@@ -121,7 +130,7 @@ bash scripts/bt/generate_noised_bt.sh
 
 #### Tagged Back-Translations
 
-Add `<BT>` tags to the back-translations obtained with beam search to create a tagged back-translation dataset.
+Add `<BT>` tags to the back-translations to create a tagged back-translation dataset.
 
 ```bash
 bash scripts/bt/generate_tagged_bt.sh
@@ -199,7 +208,7 @@ bash scripts/evaluation/evaluate_tagged_model.sh
 bash scripts/probing_tasks/create_probing_task_datasets.sh
 ```
 
-This script creates training and test sets for the probing tasks from the parallel data. It back-translates the data to create parallel (original and back-translated) datasets from which model states can be extracted in the next step.
+This script creates training and test sets for the probing tasks from the parallel data. It back-translates the data to create balanced (original and back-translation) datasets from which model states can be extracted in the next step.
 
 #### Extracting Model States
 
@@ -241,13 +250,13 @@ Combine the model states and use them as features for the probing tasks:
 bash scripts/probing_tasks/run_probing_tasks.sh
 ```
 
-This script creates a directory each in `./probing_tasks/` for the two experiments. The directories contain CSV files with the results and the pickled classifiers.
+This script creates a directory each in `./probing_tasks/` for the two experiments. The directories contain model states, CSV files for all sentences and overall results, confusion matrices and the pickled classifiers.
 
 
 
 ### 9. Analyzing Generation With and Without the `<BT>` Tag
 
-To perform qualitative analysis on the taggedBT model, generate back-translations with and without the `<BT>` tag:
+To analyze generation with the taggedBT model, generate back-translations with and without the `<BT>` tag:
 
 ```bash
 bash scripts/qualitative_analysis/generate_qualitative_analysis_data.sh
@@ -257,7 +266,7 @@ This script translates the test sets and creates raw and postprocessed output fi
 
 #### BLEU Scores
 
-To calculate BLEU scores on newstest2017 and newstest2019:
+To calculate BLEU scores on newstest2014, newstest2017 and newstest2019:
 
 ```bash
 # newstest2014

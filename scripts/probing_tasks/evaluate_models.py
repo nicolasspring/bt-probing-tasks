@@ -17,7 +17,7 @@ from fairseq.models import BaseFairseqModel
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
 from sklearn.neural_network import MLPClassifier
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Union
 
 
 def parse_args() -> argparse.Namespace:
@@ -81,7 +81,7 @@ def load_sklearn_clf(path: str) -> Union[LogisticRegression, MLPClassifier]:
     return clf
 
 
-def pad_state(tensor: torch.Tensor, max_len: int) -> Optional[torch.Tensor]:
+def pad_state(tensor: torch.Tensor, max_len: int) -> torch.Tensor:
     '''
     concatenates and pads a single model state to a specified length (in time steps)
 
